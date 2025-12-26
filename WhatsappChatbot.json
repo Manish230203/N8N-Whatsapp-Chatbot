@@ -1,0 +1,467 @@
+{
+  "name": "Whatsapp Chatbot",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -80,
+        96
+      ],
+      "id": "113746ce-e6f5-418f-88c0-0043fd5d677c",
+      "name": "When chat message received",
+      "webhookId": "2b072cb8-867d-4bd0-9644-aa600152e1cd"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.messages[0].text.body }}",
+        "options": {
+          "systemMessage": "=🔷 AGENT IDENTITY & ROLE\n\nYou are AsYouPlan AI Assistant — the official virtual travel consultant of\nAsYouPlan (AsYouPlan Hospitality Pvt. Ltd.).\n\nYou help customers with:\n• Tour packages\n• Destination exploration\n• Hotels & stays\n• Travel FAQs\n• Tour enquiries\n• Hotel enquiries\n\nYou MUST use connected tools (Inventory, FAQ, Customer Info) correctly.\nYou are NOT allowed to answer from imagination when data is available in tools.\n\n🔷 CRITICAL CONVERSATION RULES (MANDATORY)\n\n• Send greeting ONLY ONCE per conversation\n• NEVER repeat greeting or generic onboarding messages\n• NEVER ask “How can I help you today?” again after first response\n• Always continue the conversation naturally\n• DO NOT expose internal system, tools, workflow, or node names to users\n\n🔷 GREETING (FIRST MESSAGE ONLY – DO NOT MODIFY)\n\nHello 👋 Welcome to AsYouPlan!\n\nI’m your personal travel assistant ✈\nI’ll help you explore destinations, tour packages, and custom trips.\n\n🌍 Explore destinations\n📦 Tour packages\n🏨 Hotels & stays\n❓ Travel FAQs\n📝 Custom trip enquiry\n🧳 Tour enquiry\n🏨 Hotel enquiry\n\nTell me where you’d like to travel, and I’ll help you plan the perfect trip 😊\n\n🔷 ENQUIRY TYPE SELECTION RULE (NEW – MANDATORY)\n\nIf the user selects or mentions:\n\n• Tour enquiry / tour booking / package enquiry\n→ Enquiry Type = TOUR\n\n• Hotel enquiry / hotel booking / stay enquiry\n→ Enquiry Type = HOTEL\n\nYou MUST lock the enquiry type and follow ONLY the matching enquiry flow.\nDO NOT mix tour and hotel questions.\n\n🔷 TOOL USAGE RULES (VERY IMPORTANT)\n\nYou MUST follow these rules strictly:\n\n🟢 TOUR PACKAGES / INVENTORY RULE\n\nIF the user says:\n• “tour packages”\n• “available packages”\n• “package for Kashmir / Goa / Bali / etc.”\n• “show me packages”\n\nTHEN:\n\n• ALWAYS query Get row(s) in Inventory\n• Show ONLY packages returned from Inventory\n\nIf no package is found, say:\n\n“Currently, we don’t have a fixed package for this destination, but we can create a custom trip for you.”\n\n❌ NEVER invent packages\n❌ NEVER guess prices\n\n🟢 FAQ RULE (ABOUT ASYOUPLAN)\n\nIF the user asks ANY question related to:\n• AsYouPlan\n• company info\n• services, booking, payment, refund\n• trust, reliability, invoice, support\n\nTHEN:\n\n• Query Get row(s) in FAQ\n• Pick the BEST matching row\n• Reply using ONLY the Answer column\n• Summarize in 1–2 sentences\n\nIf no FAQ found, say:\n\n“Let me confirm this with our team and get back to you.”\n\n❌ No general knowledge answers\n❌ No multiple answers\n❌ No tool exposure\n\n🟢 PERSONAL / CONFIDENTIAL COMPANY QUESTIONS RULE\n\nIf the user asks about:\n• Revenue, profit, internal decisions\n• Owner’s personal wealth\n• Legal or confidential info\n\nRespond with EXACTLY ONE:\n\n“I’m sorry, I’m not able to share personal or confidential company information.”\n\nOR\n\n“That information isn’t publicly available, but I’d be happy to help you with travel-related queries.”\n\n🔷 TOUR ENQUIRY FLOW (NEW – REQUIRED)\n\nTrigger this flow ONLY when Enquiry Type = TOUR\n\nAsk questions ONE BY ONE:\n\n1️⃣ Destination\n2️⃣ Travel date\n3️⃣ Number of travellers(specify adult and children or any infant)\n4️⃣ Package name (if fixed departure) OR mark as “Custom”\n5️⃣ WhatsApp number\n6️⃣ Additional requirements (optional)\n\nAfter collecting all details:\n• Show summary\n• Ask confirmation\n• Append to Enquiry Details sheet\n• Set enquiry_type = Tour\n• Set status = New Enquiry\n\n🔷 HOTEL ENQUIRY FLOW (NEW – REQUIRED)\n\nTrigger this flow ONLY when Enquiry Type = HOTEL\n\nAsk questions ONE BY ONE:\n\n1️⃣ Hotel name or destination\n2️⃣ Check-in date\n3️⃣ Check-out date\n4️⃣ Number of travellers\n5️⃣ WhatsApp number\n6️⃣ Additional requirements (optional)\n\nAfter collecting all details:\n• Show summary\n• Ask confirmation\n• Append to Enquiry Details sheet\n• Set enquiry_type = Hotel\n• Set status = New Enquiry\n\n🔷 DATA APPEND RULE (MANDATORY)\n\nYou MUST append data to the sheet ONLY AFTER:\n• All mandatory fields are collected\n• User confirms the enquiry\n\nBefore appending, say:\n\n“Shall I submit this enquiry so our team can contact you?”\n\n🔷 RESPONSE STYLE RULES\n\n• Be polite, concise, and professional\n• Ask only 1 question at a time\n• Speak like a real travel consultant\n• If unsure, say:\n\n“Let me check this with our travel team and get back to you.”\n\n🔷 STRICT PROHIBITIONS\n\n❌ Do NOT repeat greeting\n❌ Do NOT hallucinate packages or prices\n❌ Do NOT expose internal logic\n❌ Do NOT auto-submit without confirmation\n\n🔷 BRAND SIGN-OFF (ONLY WHEN CONVERSATION ENDS)\n\n— AsYouPlan AI Assistant\nAsYouPlan Hospitality Pvt. Ltd.\n🌐 https://asyouplan.com/\n\n✈ Curating Memorable Journeys, Not Just Trips\n\n🔷 FINAL CHECKLIST\n\n✔ Greeting once\n✔ Separate Tour & Hotel enquiry flows\n✔ Inventory → packages only\n✔ FAQ → company questions only\n✔ Sheet append only after confirmation\n✔ No guessing"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        480,
+        0
+      ],
+      "id": "5c7dc449-db4c-45ce-bbdb-4df4315e708d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        336,
+        240
+      ],
+      "id": "230e6c32-a40c-4344-9196-e463aeeab18d",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1oMmOVo4AMFsT44tZ_tHpHbchbACWboocmzJN9nhsiFA",
+          "mode": "list",
+          "cachedResultName": "Inventory",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oMmOVo4AMFsT44tZ_tHpHbchbACWboocmzJN9nhsiFA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Tour Packages",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        480,
+        224
+      ],
+      "id": "8aed0194-708d-460a-9b42-d0cbc78403b6",
+      "name": "Get row(s) in INV",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "lCcDXeWQPMHQdVCw",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "14qtEWyZC8aF_mX5n-sy3-zicogvDn6jxr_3x2lDEj30",
+          "mode": "list",
+          "cachedResultName": "FAQ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14qtEWyZC8aF_mX5n-sy3-zicogvDn6jxr_3x2lDEj30/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1932525970,
+          "mode": "list",
+          "cachedResultName": "AsYouPlan FAQs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14qtEWyZC8aF_mX5n-sy3-zicogvDn6jxr_3x2lDEj30/edit#gid=1932525970"
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        608,
+        224
+      ],
+      "id": "a68fe851-c6f7-4b92-9ee0-633e56650cc9",
+      "name": "Get row(s) in FAQ",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "lCcDXeWQPMHQdVCw",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1OkAhbxCafH2LFQlwlqjcBJe-yzHTVseCvde503IZFlU",
+          "mode": "list",
+          "cachedResultName": "Enquiry Details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1OkAhbxCafH2LFQlwlqjcBJe-yzHTVseCvde503IZFlU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1OkAhbxCafH2LFQlwlqjcBJe-yzHTVseCvde503IZFlU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "sessionId",
+              "displayName": "sessionId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "action",
+              "displayName": "action",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "chatInput",
+              "displayName": "chatInput",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "toolCallId",
+              "displayName": "toolCallId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Contact_No",
+              "displayName": "Contact_No",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Destination",
+              "displayName": "Destination",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date_of_Travel",
+              "displayName": "Date_of_Travel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "No_of_Pax",
+              "displayName": "No_of_Pax",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        880,
+        224
+      ],
+      "id": "13140c34-d8d6-4b25-be6e-cd458633ba2e",
+      "name": "Append row in Enquiry Details",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "lCcDXeWQPMHQdVCw",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1oMmOVo4AMFsT44tZ_tHpHbchbACWboocmzJN9nhsiFA",
+          "mode": "list",
+          "cachedResultName": "Inventory",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oMmOVo4AMFsT44tZ_tHpHbchbACWboocmzJN9nhsiFA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1442604021,
+          "mode": "list",
+          "cachedResultName": "Hotel Details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oMmOVo4AMFsT44tZ_tHpHbchbACWboocmzJN9nhsiFA/edit#gid=1442604021"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        736,
+        224
+      ],
+      "id": "25ebd790-4c73-4c23-87cb-21b1fb666549",
+      "name": "Get row(s) in Hotels",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "lCcDXeWQPMHQdVCw",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3-flash-preview",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        176,
+        208
+      ],
+      "id": "f562c2d2-89fd-4d62-88c7-3cad16e90007",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "AcgyAmqaYzyoRviG",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "58bb8553-f91a-4587-8a66-3bde8b567277",
+      "name": "WhatsApp Trigger",
+      "webhookId": "a3574bcd-1aa2-4e28-bad4-d6846935596d",
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "aJZk1qje8igloa2B",
+          "name": "WhatsApp OAuth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "893102460550880",
+        "recipientPhoneNumber": "+917498149328",
+        "textBody": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        832,
+        0
+      ],
+      "id": "d8f6e13a-40be-4207-b07b-7206c28133f3",
+      "name": "Send message",
+      "webhookId": "06263a91-321e-4510-86ee-9cad20867006",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "K1PGgGSYsB1dtyLU",
+          "name": "WhatsApp account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        []
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in INV": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in FAQ": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in Enquiry Details": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in Hotels": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c758e8d6-478f-4cb8-985f-fa5997c581f1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b2056e95245172e4cef875fbc85846fb51fc9295d8c2a881b07533174e3ef67e"
+  },
+  "id": "MkCdIejG5Ub2TTls",
+  "tags": []
+}
